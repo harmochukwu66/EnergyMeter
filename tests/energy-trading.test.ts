@@ -1,21 +1,30 @@
+import { assertTrue, assertFalse, assertEquals } from 'vitest'
+import { Clarinet, Tx, Chain, Account, types } from 'clarinet'
 
-import { describe, expect, it } from "vitest";
-
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
-
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
-
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
-  });
-
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
-});
+Clarinet.test({
+  name: "P2P Energy Trading Contract",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    let seller = accounts.get('wallet_1')!
+    let buyer = accounts.get('wallet_2')!
+    
+    // Test initiate-trade
+    let p2pContracct = chain.getContract('p2p-energy-trading', seller.address)
+    let tx = await Tx.invoke(p2pContracct, 'initiate-trade', [
+      seller.address,
+      buyer.address,
+      types.uint(1000),
+      types.uint(0.25)
+    ])
+    assertEquals(chain.getHeight(), tx.height)
+    assertEquals(await p2pContracct.call('get-seller'), seller.address)
+    assertEquals(await p2pContracct.call('get-buyer'), buyer.address)
+    assertEquals(await p2pContracct.call('get-energy-amount'), types.uint(1000))
+    assertEquals(await p2pContracct.call('get-price-per-unit'), types.uint(0.25))
+    assertFalse(await p2pContracct.call('get-is-completed'))
+    
+    // Test complete-trade
+    tx = await Tx.invoke(p2pContracct, 'complete-trade', [])
+    assertEquals(chain.getHeight(), tx.height)
+    assertTrue(await p2pContracct.call('get-is-completed'))
+  }
+})

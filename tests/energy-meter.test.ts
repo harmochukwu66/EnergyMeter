@@ -18,3 +18,4 @@ Clarinet.test({
     assertEquals(await energyMeterContract.call('get-total-energy-sold'), types.uint(500))
   }
 })
+
