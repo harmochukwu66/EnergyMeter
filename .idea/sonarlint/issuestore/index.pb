@@ -11,3 +11,5 @@ L
 tests/energy-trading.test.ts,9/c/9cba7fe1dec9bcb62306bf4705154e7113ca0c31
 H
 contracts/incentive.clar,6/c/6c402fdd11fb3ca38cc50f80171a7d7f4dc5a36d
+G
+tests/incentive.test.ts,0/5/05d67f384b8531f816c2a9f5addfe62687f53f2e

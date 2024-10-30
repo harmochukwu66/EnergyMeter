@@ -1,21 +1,20 @@
+import { assertTrue, assertFalse, assertEquals } from 'vitest'
+import { Clarinet, Tx, Chain, Account, types } from 'clarinet'
 
-import { describe, expect, it } from "vitest";
-
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
-
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
-
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
-  });
-
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
-});
+Clarinet.test({
+  name: "Incentives Contract",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    let user = accounts.get('wallet_1')!
+    
+    // Test record-energy-generation
+    let incentivesContract = chain.getContract('incentives', user.address)
+    let tx = await Tx.invoke(incentivesContract, 'record-energy-generation', [
+      types.uint(1000),
+      types.uint(80)
+    ])
+    assertEquals(chain.getHeight(), tx.height)
+    assertEquals(await incentivesContract.call('get-energy-generated'), types.uint(1000))
+    assertEquals(await incentivesContract.call('get-renewable-percentage'), types.uint(80))
+    assertEquals(await incentivesContract.call('get-total-incentives-earned'), types.uint(200))
+  }
+})
