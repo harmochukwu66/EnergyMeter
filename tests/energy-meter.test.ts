@@ -1,21 +1,20 @@
+import { assertTrue, assertFalse, assertEquals } from 'vitest'
+import { Clarinet, Tx, Chain, Account, types } from 'clarinet'
 
-import { describe, expect, it } from "vitest";
-
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
-
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
-
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
-  });
-
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
-});
+Clarinet.test({
+  name: "Energy Meter Contract",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    let owner = accounts.get('deployer')!
+    
+    // Test record-energy-generation
+    let energyMeterContract = chain.getContract('energy-meter', owner.address)
+    let tx = await Tx.invoke(energyMeterContract, 'record-energy-generation', [types.uint(1000)])
+    assertEquals(chain.getHeight(), tx.height)
+    assertEquals(await energyMeterContract.call('get-total-energy-generated'), types.uint(1000))
+    
+    // Test record-energy-sale
+    tx = await Tx.invoke(energyMeterContract, 'record-energy-sale', [types.uint(500)])
+    assertEquals(chain.getHeight(), tx.height)
+    assertEquals(await energyMeterContract.call('get-total-energy-sold'), types.uint(500))
+  }
+})
