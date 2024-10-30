@@ -5,3 +5,5 @@ K
 contracts/energy-meter.clar,d/b/dbc91377990637ad3635f6ee2e76f4ea4e6d7a3a
 J
 tests/energy-meter.test.ts,2/1/21134c8a7867ef005234d2d89cd82706dd7ea9bf
+M
+contracts/energy-trading.clar,6/d/6d7212ff31b8b2c7ed59770341c7a8a4407ae036
